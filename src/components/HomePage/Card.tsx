@@ -4,7 +4,7 @@ import Images from "@/assets/Images";
 import { UIButton } from "../Common/Buttons/UIButton";
 import { AiOutlineClose, AiOutlineCloseCircle } from "react-icons/ai";
 
-const Card = ({wishlist}:{wishlist:boolean}) => {
+const Card = ({wishlist}:{wishlist?:boolean}) => {
   return (
     <div className={`w-4/5 md:w-full m-auto ${wishlist?"h-[35rem]":"h-80"} hover:shadow-xl hover:border border-secondary my-4 cursor-pointer rounded relative`}>
       <div className="w-full object-fill h-2/3 p-2 rounded-xl">
