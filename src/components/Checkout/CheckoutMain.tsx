@@ -1,7 +1,8 @@
-import { OrderSummary } from "@/pages/detailCart";
+
 import Link from "next/link";
 import React, { useState } from "react";
 import { UIButton } from "../Common/Buttons/UIButton";
+import { OrderSummary } from "../DetailCart/DetailCart";
 import { Address } from "./Address";
 import AddressForm from "./AddressForm";
 import CheckoutStep from "./CheckoutStep";

@@ -164,7 +164,7 @@ const DetailCart = () => {
   useEffect(() => {
     dispatch({ type: actionTypes.GET_CART_REQ });
     dispatch({ type: actionTypes.GET_CART_SUCCESS });
-  }, [state.cartproducts]);
+  });
   const removeItem = (id: number) => {
     dispatch({ type: actionTypes.REMOVE_ITEM, payload: id });
   };
