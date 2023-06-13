@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from 'react'
 import BottomPart from './BottomPart';
 import LeftSection from './LeftSection';
@@ -45,12 +46,12 @@ const ProductPage = () => {
         <>
           <div className="w-full p-4 md:p-12 mt-0 overflow-x-hidden">
             <div className="flex mr-4 mb-8 ml-4">
-              <a
+              <Link
                 className="font-bold mx-4 text-secondary cursor-pointer"
-                href="/"
+                href="/homepage"
               >
                 Home
-              </a>
+              </Link>
               <span className="font-bold mx-4 text-secondary cursor-pointer">
                 &gt;
               </span>

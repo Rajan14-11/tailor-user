@@ -13,8 +13,8 @@ const Subscribe = () => {
         <div className="sm:w-1/2 sm:mx-2">
           <h1 className="text-2xl font-bold sm:text-3xl mb-6 font-secondary">Subscribe to your newsletter</h1>
           <p className="text-xl sm:text-2xl mb-6 font-primary">
-            Lorem Ipsum as their default model text, and a search for 'lorem
-            ipsum' will uncover many web sites still in their infancy.
+            Lorem Ipsum as their default model text, and a search for lorem
+            ipsum will uncover many web sites still in their infancy.
           </p>
           <div className="flex p-2">
             <input className="rounded-l font-primary w-full border-none px-4 text-xl focus:outline-none" type="email" placeholder="email@freshmeal.com" />

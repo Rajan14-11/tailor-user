@@ -73,7 +73,8 @@ const SideCart = () => {
     useEffect(() => {
       dispatch({type:actionTypes.GET_CART_REQ})
       dispatch({type:actionTypes.GET_CART_SUCCESS})
-    }, [state.cartproducts])
+    })
+
    const removeItem = (id:number) => {
      dispatch({type:actionTypes.REMOVE_ITEM,payload:id});
    };
@@ -173,7 +174,7 @@ const SideCart = () => {
                 ))
               ) : (
                 <div className="flex flex-col items-center justify-center">
-                  <img src="/imgs/download.png" />
+                  <Image src="/imgs/download.png" alt="downlaod" />
                   <h4>Your Cart is empty </h4>
                 </div>
               )}

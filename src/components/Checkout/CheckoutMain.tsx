@@ -128,13 +128,14 @@ const CheckoutMain = () => {
                     <div className="font-neutral">{`${selectedAddress.name} ${selectedAddress.address} - ${selectedAddress.pinCode}`}</div>
                   </div>
                 ) : (
-                  address.map((adr) => (
+                  address.map((adr,index) => (
                     <Address
                       selectAddress={selectAddress}
                       enableAddressEditForm={enableAddressEditForm}
                       confirmDeliveryAddress={confirmDeliveryAddress}
                       onAddressSubmit={onAddressSubmit}
                       adr={adr}
+                      key={index}
                     />
                   ))
                 )}
@@ -167,7 +168,7 @@ const CheckoutMain = () => {
                       <div className="flex flex-col sm:flex-row justify-between items-center mt-4">
                         <p className="w-full px-4 font-primary font-semibold">
                           Order confirmation email will be sent to{" "}
-                          <strong>"Rajan@gmail.com</strong>
+                          <strong>Rajan@gmail.com</strong>
                         </p>
                         <UIButton
                           title="CONTINUE"
