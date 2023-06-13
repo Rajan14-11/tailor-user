@@ -4,7 +4,7 @@ import Topbar from "@/components/HomePage/Topbar";
 import LandingPageFooter from "@/components/LandingPage/LandingPageFooter";
 import Link from "next/link";
 import React from "react";
-import { OrderSummary } from "./detailCart";
+import { OrderSummary } from "@/components/DetailCart/DetailCart";
 
 export const OrderDetailsCard = () => {
    const adr =  { name:"Rajan",
