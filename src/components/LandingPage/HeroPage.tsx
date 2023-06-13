@@ -33,11 +33,11 @@ function HeroPage() {
           name="location"
           className="rounded-l p-2 outline-none w-[80%] md:w-[30%] "
         />
-        <Link href='/homepage'>
-        <button className="bg-primary font-secondary p-2 rounded-r font-bold text-neutral md:w-[15%]">
+
+        <Link href='/homepage' className="bg-primary font-secondary p-2 rounded-r font-bold text-neutral md:w-[15%]">
           Click Me
-        </button>
         </Link>
+  
       </div>
     </div>
   );
