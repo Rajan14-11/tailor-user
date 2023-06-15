@@ -14,7 +14,7 @@ function signup() {
     <>
       <Header />
 
-      <div className="w-full h-fit sm:h-[95vh] bg-login-gradient flex sm:items-center justify-center">
+      <div className="w-full h-fit sm:h-fit bg-login-gradient flex sm:items-center justify-center">
         {/* <div className="w-full h-full backdrop-brightness-50 p-4"> */}
         <div className="flex items-center justify-center w-full h-full">
           <div className="p-4 flex justify-center sm:items-center w-full md:justify-evenly md:flex-row-reverse h-full">
