@@ -162,19 +162,19 @@ const DetailCart = () => {
   let quantity = 0;
   const { dispatch, state } = useCartStateContext();
   useEffect(() => {
-    dispatch({ type: actionTypes.GET_CART_REQ });
-    dispatch({ type: actionTypes.GET_CART_SUCCESS });
+    // dispatch({ type: actionTypes.GET_CART_REQ });
+    // dispatch({ type: actionTypes.GET_CART_SUCCESS });
   });
   const removeItem = (id: number) => {
-    dispatch({ type: actionTypes.REMOVE_ITEM, payload: id });
+    // dispatch({ type: actionTypes.REMOVE_ITEM, payload: id });
   };
 
   const increaseProductCount = (id: number) => {
-    dispatch({ type: actionTypes.INCREASE_COUNT, payload: id });
+    // dispatch({ type: actionTypes.INCREASE_COUNT, payload: id });
   };
 
   const decreaseProductCount = (id: number) => {
-    dispatch({ type: actionTypes.DECREASE_COUNT, payload: id });
+    // dispatch({ type: actionTypes.DECREASE_COUNT, payload: id });
   };
   return (
     <div className="bg-neutral h-fit">

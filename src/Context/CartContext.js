@@ -84,7 +84,7 @@ export const actionTypes = {
 
 
 export function reducer(state, action) {
-  console.log("hii")
+  // console.log("hii")
    const item = state.cartproducts.find(
     (item) => item.id === action.payload
   );
@@ -92,7 +92,7 @@ export function reducer(state, action) {
   // const item = state?.cartproducts?.products.find(
   //   (item) => item.id === action.payload
   // );
-  console.log(item);
+  // console.log(item);
   switch (action.type) {
     case actionTypes.GET_CART_REQ:
       return {...state,loading:true}
