@@ -1,5 +1,3 @@
-const { hostname } = require('os');
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -7,4 +5,4 @@ const nextConfig = {
     domains: ["i.dummyjson.com"],
   },
 };
-module.exports = nextConfig
+module.exports = nextConfig;

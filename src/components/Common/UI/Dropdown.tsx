@@ -1,12 +1,13 @@
 import Link from 'next/link'
 import React, { Component, useState } from 'react'
+import { MouseEventHandler } from 'react'
 
 interface Menu{
     label:string,
     href:string,
     icon:null|any,
-    onClick?:Function
-}
+    onClick?:MouseEventHandler
+  }
 
 interface Props{
 menus:Menu[],
@@ -36,7 +37,9 @@ const Dropdown = (props:Props) => {
                 className="list-none block p-6 border-b hover:cursor-pointer hover:text-primary"
                 key={index}
               >
-                <Link href={item.href} className="flex items-center ">
+                <Link href={item.href} className="flex items-center "
+                 onClick={item.onClick}
+                 >
                   <h1 className='font-primary text-xl font-semibold mr-2'>{item.icon}</h1>
                   <p>{item.label}</p>
                 </Link>

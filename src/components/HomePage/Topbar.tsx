@@ -14,51 +14,79 @@ import {BsFillBookmarkHeartFill} from "react-icons/bs"
 import Dropdown from "../Common/UI/Dropdown";
 import SelectLocation from "./SelectLocation";
 import SideCart from "./SideCart";
+import { isUserAuthenticated, logout } from "@/Redux/userSlice";
+import Cookies from "js-cookie";
 
-interface Props{
-  show:boolean,
-  setShow:Function
+import { useAppDispatch } from "@/Redux/hooks";
+import Router from "next/router";
+
+interface Props {
+  show: boolean;
+  setShow: Function;
 }
- const RenderLoggedInMenu = ({show,setShow}:Props) => {
-   return (
-     <Dropdown
-       show={show}
-       setShow={setShow}
-       menus={[
-         { label: "My Profile", href: "", icon: <RiProfileFill/> },
-         {
-           label: "Orders",
-           href: `/orders`,
-           icon: <AiFillDropboxSquare/>,
-         },
-         { label: "Wishlist", href: "/wishlist", icon: <BsFillBookmarkHeartFill /> },
-         { label: "Logout", href: "", icon: <RiLogoutBoxFill/> },
-       ]}
-     />
-   );
- };
 
- const RenderNonLoggedInMenu = ({show,setShow}:Props) => {
-   return (
-     <Dropdown
+
+
+const RenderLoggedInMenu = ({ show, setShow }: Props) => {
+  const dispatch = useAppDispatch();
+
+  function handleLogout() {
+    Cookies.remove("token");
+    Router.push("/");
+    dispatch(logout());
+    Cookies.set("isUserAuthenticated", false);
+    Cookies.set('user','')
+  }
+  return (
+    <Dropdown
       show={show}
       setShow={setShow}
-       menus={[
-         { label: "SignIn", href: "", icon: null },
-         { label: "SignUp", href: "", icon: null },
-         { label: "Need Help", href: "", icon: null },
-       ]}
-     />
-   );
- };
+      menus={[
+        { label: "My Profile", href: "", icon: <RiProfileFill /> },
+        {
+          label: "Orders",
+          href: `/orders`,
+          icon: <AiFillDropboxSquare />,
+        },
+        {
+          label: "Wishlist",
+          href: "/wishlist",
+          icon: <BsFillBookmarkHeartFill />,
+        },
+        {
+          label: "Logout",
+          href: "",
+          icon: <RiLogoutBoxFill />,
+          onClick :  handleLogout,
+        },
+      ]}
+    />
+  );
+};
 
+const RenderNonLoggedInMenu = ({ show, setShow }: Props) => {
+  return (
+    <Dropdown
+      show={show}
+      setShow={setShow}
+      menus={[
+        { label: "SignIn", href: "", icon: null },
+        { label: "SignUp", href: "", icon: null },
+        { label: "Need Help", href: "", icon: null },
+      ]}
+    />
+  );
+};
 
 function Topbar() {
-  const user = true;
-    const [show, setShow] = useState(false);
+
+
+  const user = Cookies.get("isUserAuthenticated");
+  // console.log(user);
+  const [show, setShow] = useState(false);
   const { openCart, setOpenCart, selectLocation, setSelectLocation } =
     useStateContext();
-  console.log(openCart);
+  // console.log(openCart);
   return (
     <div className="flex justify-evenly items-center w-full h-16 px-4 bg-neutral sticky top-0 z-[100] font-secondary">
       <Link href={"/homepage"} className="w-1/4 sm:w-[10%] h-full mr-2 py-4">
@@ -101,12 +129,14 @@ function Topbar() {
             className="sm:block hidden hover:text-primary"
             onMouseEnter={() => setShow(true)}
           >
-            Username
+            {Cookies.get('user')}
           </button>
         ) : (
-          <Link href={"/login"}>
-            <button className="hover:text-primary">Sign In</button>
-          </Link>
+          // <Link href={"/login"}>
+          <button className="sm:block hidden hover:text-primary">
+            Sign In
+          </button>
+          // </Link>
         )}
         {user ? (
           <RenderLoggedInMenu show={show} setShow={setShow} />

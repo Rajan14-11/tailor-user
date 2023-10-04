@@ -1,15 +1,42 @@
 import Images from '@/assets/Images';
 import TextInput, { MyCheckbox } from '@/components/Common/Inputs/TextInput';
 import Header from '@/components/Header/Header';
-import { loginSchema, signUpSchema } from '@/schemas';
+import { useSignupMutation } from '@/Redux/api';
+import { useAppDispatch } from '@/Redux/hooks';
+import { loginSlice } from '@/Redux/userSlice';
+import { signUpSchema } from '@/schemas';
 import { Form, Formik } from 'formik';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React from 'react'
-import { useMutation } from "react-query";
+import { toast } from 'react-toastify';
 
 function signup() {
-  // const {mutate} = useMutation()
+  const router = useRouter()
+  const [signup,{data,isError,isLoading,error,isSuccess}] = useSignupMutation()
+  const dispatch = useAppDispatch();
+  if (isSuccess) {
+    dispatch(loginSlice(data));
+    toast.success("Signup Successfully", {
+      position: toast.POSITION.TOP_RIGHT,
+      autoClose: 5000,
+    });
+    router.push('/login');
+  }
+
+  if (isError) {
+    let errMsg;
+    if (error && "status" in error) {
+      errMsg = "error" in error ? error.error : JSON.stringify(error.data);
+    } else {
+      errMsg = error?.message;
+    }
+    toast.error(errMsg, {
+      position: toast.POSITION.TOP_RIGHT,
+      autoClose: 5000,
+    });
+  }
   return (
     <>
       <Header />
@@ -19,19 +46,29 @@ function signup() {
         <div className="flex items-center justify-center w-full h-full">
           <div className="p-4 flex justify-center sm:items-center w-full md:justify-evenly md:flex-row-reverse h-full">
             <div className="w-[75vw] bg-login-form text-slate-100 rounded p-4 sm:w-3/4 lg:w-1/2 h-fit py-8">
-              <h1 className="mb-4 text-center text-2xl">Register with Us ...</h1>
+              <h1 className="mb-4 text-center text-2xl">
+                Register with Us ...
+              </h1>
               <Formik
                 initialValues={{
-                  first_name: "",
-                  last_name: "",
+                  firstName: "",
+                  lastName: "",
                   email: "",
-                  username: "",
+                  userName: "",
                   password: "",
                   confirm_password: "",
-                  terms_and_policy: false,
+                  terms_and_policy: true,
                 }}
                 onSubmit={(values, actions) => {
-
+                  signup({
+                    firstName: values.firstName,
+                    lastName: values.lastName,
+                    email: values.email,
+                    userName: values.userName,
+                    password: values.password,
+                    confirm_password: values.confirm_password,
+                    terms_and_policy: values.terms_and_policy,
+                  });
                   // action.resetForm()
                 }}
                 validationSchema={signUpSchema}
@@ -42,7 +79,7 @@ function signup() {
                       <TextInput
                         css={"flex flex-col gap-1"}
                         label="First Name"
-                        name="first_name"
+                        name="firstName"
                         type="text"
                         placeholder="firstName"
                       />
@@ -51,7 +88,7 @@ function signup() {
                       <TextInput
                         css={"flex flex-col gap-1"}
                         label="Last Name"
-                        name="last_name"
+                        name="lastName"
                         type="text"
                         placeholder="lastName"
                       />
@@ -71,7 +108,7 @@ function signup() {
                       <TextInput
                         css={"flex flex-col gap-1"}
                         label="Username"
-                        name="username"
+                        name="userName"
                         type="text"
                         placeholder="username"
                       />
@@ -113,7 +150,12 @@ function signup() {
                     </button>
                     {/* <ToastContainer /> */}
                   </div>
-                  <h3 className="mb-2 text-base">Already a Member ? <Link href={'/login'} className='underline '>Login Now</Link> </h3>
+                  <h3 className="mb-2 text-base">
+                    Already a Member ?{" "}
+                    <Link href={"/login"} className="underline ">
+                      Login Now
+                    </Link>{" "}
+                  </h3>
                 </Form>
               </Formik>
             </div>

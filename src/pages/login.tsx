@@ -6,11 +6,41 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
 import Images from "@/assets/Images";
+import { useLoginMutation } from "@/Redux/api";
+import Cookies from "js-cookie";
+import { loginSlice } from "@/Redux/userSlice";
+import { useRouter } from "next/router";
+import { useAppDispatch } from "@/Redux/hooks";
+import { toast, ToastContainer } from "react-toastify";
 
 function Login() {
-  const [message, setMessage] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const router = useRouter()
+  const dispatch = useAppDispatch()
+  const [login,{data,isLoading,isError,isSuccess,error}] = useLoginMutation()
+if (isSuccess) {
+  Cookies.set("token", data?.token);
+  Cookies.set("isUserAuthenticated", true);
+  Cookies.set("user", data?.user.fullName);
+  dispatch(loginSlice(data));
+  toast.success("Login Successfully", {
+    position: toast.POSITION.TOP_RIGHT,
+    autoClose: 5000,
+  });
+  router.push("/homepage");
+}
 
+if (isError) {
+  let errMsg;
+  if (error && "status" in error) {
+    errMsg = "error" in error ? error.error : JSON.stringify(error.data);
+  } else {
+    errMsg = error?.message;
+  }
+  toast.error(errMsg, {
+    position: toast.POSITION.TOP_RIGHT,
+    autoClose: 5000,
+  });
+}
   return (
     <>
 
@@ -24,13 +54,15 @@ function Login() {
               <h3 className="mb-2">{true ? "Login" : "Register"}</h3>
               <Formik
                 initialValues={{
-                  username: "",
+                  email: "",
                   password: "",
                   checkbox: false,
                 }}
-                onSubmit={() => {
-                  setMessage("Form submitted");
-                  setSubmitted(true);
+                onSubmit={(values,action) => {
+                  login({
+                    email:values.email,
+                    password:values.password
+                  })
                 }}
                 validationSchema={loginSchema}
               >
@@ -38,9 +70,9 @@ function Login() {
                   <TextInput
                     css={"flex flex-col gap-1"}
                     label="Username"
-                    name="username"
+                    name="email"
                     type="text"
-                    placeholder="username"
+                    placeholder="Email"
                   />
 
                   <TextInput
@@ -48,7 +80,7 @@ function Login() {
                     label="Password"
                     name="password"
                     type="password"
-                    placeholder="password"
+                    placeholder="Password"
                   />
                   <button
                     className="w-full mt-8 mb-2 py-3 bg-slate-100 text-black rounded-full font-bold hover:bg-primary hover:text-stone-900 "
@@ -83,6 +115,7 @@ function Login() {
           </div>
         </div>
         {/* </div> */}
+        <ToastContainer/>
       </div>
     </>
   );
