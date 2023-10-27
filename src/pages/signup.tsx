@@ -6,6 +6,7 @@ import { useAppDispatch } from '@/Redux/hooks';
 import { loginSlice } from '@/Redux/userSlice';
 import { signUpSchema } from '@/schemas';
 import { Form, Formik } from 'formik';
+import Cookies from 'js-cookie';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -22,7 +23,7 @@ function signup() {
       position: toast.POSITION.TOP_RIGHT,
       autoClose: 5000,
     });
-    router.push('/login');
+    router.push('/verifyEmail');
   }
 
   if (isError) {
@@ -60,6 +61,7 @@ function signup() {
                   terms_and_policy: true,
                 }}
                 onSubmit={(values, actions) => {
+                  Cookies.set('userEmail',values.email)
                   signup({
                     firstName: values.firstName,
                     lastName: values.lastName,

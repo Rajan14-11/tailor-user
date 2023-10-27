@@ -1,94 +1,61 @@
-import Images from '@/assets/Images';
-import { actionTypes, useCartStateContext } from '@/Context/CartContext';
-import {useStateContext} from "@/Context/ContextState"
-import Image from 'next/image';
-import Link from 'next/link';
-import React,{useEffect} from 'react'
-import { AiOutlineClose, AiOutlineMinusCircle, AiOutlinePlusCircle } from 'react-icons/ai';
-import {ImBin} from "react-icons/im"
-import { UIButton } from '../Common/Buttons/UIButton';
+import Images from "@/assets/Images";
+import { actionTypes, useCartStateContext } from "@/Context/CartContext";
+import { useStateContext } from "@/Context/ContextState";
+import { useGetCartMutation } from "@/Redux/api";
+import { useAppSelector } from "@/Redux/hooks";
+import Image from "next/image";
+import Link from "next/link";
+import React, { useEffect, useState } from "react";
+import {
+  AiOutlineClose,
+  AiOutlineMinusCircle,
+  AiOutlinePlusCircle,
+} from "react-icons/ai";
+import { ImBin } from "react-icons/im";
+import { UIButton } from "../Common/Buttons/UIButton";
 // import CurrencyFormat from "react-currency-format";
 
-const allproducts = {
-  id: 1,
-  products: [
-    {
-      id: 59,
-      title: "Spring and summershoes",
-      price: 20,
-      quantity: 3,
-      total: 60,
-      discountPercentage: 8.71,
-      discountedPrice: 55,
-    },
-    {
-      id: 88,
-      title: "TC Reusable Silicone Magic Washing Gloves",
-      price: 29,
-      quantity: 2,
-      total: 58,
-      discountPercentage: 3.19,
-      discountedPrice: 56,
-    },
-    {
-      id: 18,
-      title: "Oil Free Moisturizer 100ml",
-      price: 40,
-      quantity: 2,
-      total: 80,
-      discountPercentage: 13.1,
-      discountedPrice: 70,
-    },
-    {
-      id: 95,
-      title: "Wholesale cargo lashing Belt",
-      price: 930,
-      quantity: 1,
-      total: 930,
-      discountPercentage: 17.67,
-      discountedPrice: 766,
-    },
-    {
-      id: 39,
-      title: "Women Sweaters Wool",
-      price: 600,
-      quantity: 2,
-      total: 1200,
-      discountPercentage: 17.2,
-      discountedPrice: 994,
-    },
-  ],
-  total: 2328,
-  discountedTotal: 1941,
-  userId: 97,
-  totalProducts: 5,
-  totalQuantity: 10,
-};
-
 const SideCart = () => {
-      let quantity = 10;
-      const { dispatch, state } = useCartStateContext();
-      const {setOpenCart} = useStateContext()
+  let quantity = 10;
+  const { dispatch, state } = useCartStateContext();
+  const { setOpenCart } = useStateContext();
+  const cart = useAppSelector((state) => state.cart);
+  const auth = useAppSelector((state) => state.user.isAuthenticated);
+  const [cartItems, setCartItems] = useState(cart.cartItems);
+  // console.log(cartItems);
+  const [getCartItems, { data, isSuccess, isError, error, isLoading }] =
+    useGetCartMutation();
 
-    useEffect(() => {
-      dispatch({type:actionTypes.GET_CART_REQ})
-      dispatch({type:actionTypes.GET_CART_SUCCESS})
-    })
+  useEffect(() => {
+    if (auth) {
+      getCartItems("");
+    }
+  }, [auth]);
 
-   const removeItem = (id:number) => {
-     dispatch({type:actionTypes.REMOVE_ITEM,payload:id});
-   };
+  useEffect(() => {
+    if (data === undefined) setCartItems(cart.cartItems);
+    else setCartItems(data?.newItems);
+  }, [cart.cartItems]);
+  // useEffect(()=>{
+  //   setCartItems(data?.newItems);
+  //   console.log(cartItems)
+  // },[typeof(data)])
 
-   const increaseProductCount = (id:number) => {
-     dispatch({type:actionTypes.INCREASE_COUNT,payload:id});
-   };
-   const decreaseProductCount = (id:number) => {
-     dispatch({type:actionTypes.DECREASE_COUNT,payload:id});
-   };
+  //  console.log(data,error,typeof(data))
+  const removeItem = (id: number) => {
+    dispatch({ type: actionTypes.REMOVE_ITEM, payload: id });
+  };
 
-   const clearCart = () => {
-     dispatch({});
-   };
+  const increaseProductCount = (id: number) => {
+    dispatch({ type: actionTypes.INCREASE_COUNT, payload: id });
+  };
+  const decreaseProductCount = (id: number) => {
+    dispatch({ type: actionTypes.DECREASE_COUNT, payload: id });
+  };
+
+  const clearCart = () => {
+    dispatch({});
+  };
   return (
     <>
       <div className="backdrop-brightness-50 w-full h-screen fixed top-0 right-0 z-[2]">
@@ -103,44 +70,52 @@ const SideCart = () => {
 
           <div>
             <div className="grid gap-4 p-4">
-              {allproducts.totalQuantity !== 0 ? (
-                allproducts.products.map((singleproduct) => (
+              {cartItems !== undefined ? (
+                Object.keys(cartItems && cartItems).map((key) => (
                   <>
                     <div
                       className="grid items-center my-6 border-b-[1px] border-b-black border-spacing-[10px]"
-                      key={singleproduct.id}
+                      key={cartItems[key]._id}
                     >
                       <div className="mb-8 flex w-full h-40 items-center justify-center py-4 gap-4 ">
-                        <Link href={`/productdetail/${singleproduct.id}`}>
+                        <Link href={`/productdetail/${cartItems[key]._id}`}>
                           <Image
-                            src={Images.service1}
+                            src={
+                              cartItems[key].img !== undefined
+                                ? cartItems[key].img
+                                : cartItems[key].productPictures[0].img
+                            }
                             alt=""
                             className="w-full h-40 rounded "
+                            width={500}
+                            height={500}
                           />
                         </Link>
                         <div className="mx-8 w-1/2 flex flex-col justify-center">
-                          <h4 className="font-bold ">{singleproduct.title}</h4>
-                          <h6 className='font-primary text-xl font-semibold'>{"summary"}</h6>
+                          <h4 className="font-bold ">{cartItems[key].name}</h4>
+                          <h6 className="font-primary text-xl font-semibold">
+                            {"summary"}
+                          </h6>
 
-                          {singleproduct.quantity > 0 ? (
+                          {cartItems[key].qty > 0 ? (
                             <div className="flex w-full items-center">
                               <AiOutlineMinusCircle
                                 className="cursor-pointer hover:text-primary text-xl"
                                 onClick={
-                                  singleproduct.quantity > 1
+                                  cartItems[key].qty > 1
                                     ? () =>
-                                        decreaseProductCount(singleproduct.id)
-                                    : () => removeItem(singleproduct.id)
+                                        decreaseProductCount(cartItems[key]._id)
+                                    : () => removeItem(cartItems[key]._id)
                                 }
                               />
 
                               <p className="mx-4 text-xl py-4 px-2 ">
-                                {singleproduct.quantity}
+                                {cartItems[key].qty}
                               </p>
                               <AiOutlinePlusCircle
                                 className="cursor-pointer hover:text-primary text-xl"
                                 onClick={() =>
-                                  increaseProductCount(singleproduct.id)
+                                  increaseProductCount(cartItems[key]._id)
                                 }
                               />
                             </div>
@@ -153,16 +128,16 @@ const SideCart = () => {
                         <div className="flex flex-col items-center justify-between w-1/6 h-full">
                           <ImBin
                             className="cursor-pointer hover:text-primary text-xl"
-                            onClick={() => removeItem(singleproduct.id)}
+                            onClick={() => removeItem(cartItems[key]._id)}
                           />
 
-                          {singleproduct.quantity > 0 ? (
+                          {cartItems[key].qty > 0 ? (
                             <h5 className="text-xl">
                               <span className="font-semibold text-black mr-1">
                                 ₹
                               </span>
 
-                              {singleproduct.price * singleproduct.quantity}
+                              {cartItems[key].price * cartItems[key].qty}
                             </h5>
                           ) : (
                             " "
@@ -174,28 +149,40 @@ const SideCart = () => {
                 ))
               ) : (
                 <div className="flex flex-col items-center justify-center">
-                  <Image src="/imgs/download.png" alt="downlaod" />
+                  <Image
+                    src="/imgs/download.png"
+                    alt="download"
+                    width={600}
+                    height={600}
+                  />
                   <h4>Your Cart is empty </h4>
                 </div>
               )}
-              {quantity !== 0  ? (
+              {quantity !== 0 ? (
                 <div className="mb-4 flex flex-col justify-center items-center">
-                  <UIButton title="Clear Cart" onClick={clearCart} css="flex justify-center"/>
+                  <UIButton
+                    title="Clear Cart"
+                    onClick={clearCart}
+                    css="flex justify-center"
+                  />
 
-              <Link href={"/checkout"}>
-                    <UIButton title="Checkout" css="mb-12" onClick={()=>setOpenCart(false)}/>
+                  <Link href={"/checkout"}>
+                    <UIButton
+                      title="Checkout"
+                      css="mb-12"
+                      onClick={() => setOpenCart(false)}
+                    />
                   </Link>
-              </div>
-               ) : (
+                </div>
+              ) : (
                 ""
-              )
-               }
+              )}
             </div>
           </div>
         </div>
       </div>
     </>
   );
-}
+};
 
-export default SideCart
+export default SideCart;

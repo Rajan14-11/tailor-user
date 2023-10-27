@@ -16,7 +16,7 @@ setShow:Function
 }
 
 const Dropdown = (props:Props) => {
-    console.log(props.show)
+    // console.log(props.show)
   return (
     <div
       className={`relative inline-block`}

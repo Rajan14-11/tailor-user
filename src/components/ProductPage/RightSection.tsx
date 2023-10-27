@@ -1,5 +1,9 @@
+import { useAddToCartMutation } from "@/Redux/api";
+// import { addTocart } from "@/Redux/cartSlice";
+import { useAppDispatch, useAppSelector } from "@/Redux/hooks";
 import Link from "next/link";
-import React, { useState } from "react";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
 import { UIButton } from "../Common/Buttons/UIButton";
 
 interface Product {
@@ -19,36 +23,63 @@ interface Product {
 interface Props {
   product: Product;
 }
-const RightSection = ({ product }: Props) => {
+const RightSection = ({ product, addTocart }: any) => {
   const rating = product && product.rating;
-  const maxPrice = (
-    product &&
-    product.price +
-      (product && product.discountPercentage / 100) * (product && product.price)
+  const discount = (
+    product && ((product.maxPrice - product.price) / product.maxPrice) * 100
   ).toFixed(2);
 
   const [changeValue, setChangeValue] = useState(1);
   const [counterValue, setCounterValue] = useState(1);
   const [totalPrice, setTotalPrice] = useState(product && product.price);
-  const Cart = () => {
-    // ("/detailcart", { replace: true });
-  };
 
   const increment = () => {
     setCounterValue((prevValue) => prevValue + changeValue);
     setTotalPrice(product && product.price * (counterValue + 1));
   };
+
+  const [addToCartMutation, { data, error, isSuccess, isError }] =
+    useAddToCartMutation();
+  const userAuth = useAppSelector((state) => state.user.isAuthenticated);
+  const router = useRouter();
+
+  const handleAddtoCart = () => {
+    // console.log(product);
+
+   const payload =  addTocart(product._id, product.name, product.price, counterValue);
+  //  console.log(payload)
+
+   if(userAuth){
+    addToCartMutation({productId:product._id,quantity:counterValue})
+   }
+   else{
+    if(typeof window!=="undefined"){
+      window.localStorage.setItem('cart',JSON.stringify(payload))
+      window.localStorage.setItem('lastRoute',router.asPath)
+    }
+    router.push('/login')
+   }
+  };
+
+  if(data){
+    router.push('/detailCart')
+  }
+
   return (
     <>
       <div className="w-full md:w-[45%] ">
         <div className="flex flex-col items-center md:items-start justify-center md:justify-start m-4 p-8 w-full z-[1] overflow-hidden">
           <strong>
             <div className="w-full">
-              <h3 className="text-2xl mb-2 font-bold font-secondary">{product && product.title}</h3>
+              <h3 className="text-2xl mb-2 font-bold font-secondary">
+                {product && product.name}
+              </h3>
             </div>
           </strong>
 
-          <p className="text-xl text-slate-600 font-primary">{product && product.description}</p>
+          <p className="text-xl text-slate-600 font-primary">
+            {product && product.description}
+          </p>
 
           <div className="flex justify-center items-center font-secondary">
             <p className="mt-2 text-2xl">
@@ -57,15 +88,13 @@ const RightSection = ({ product }: Props) => {
             </p>
             <p className="mt-2 text-xl ml-4 text-slate-500 line-through ">
               <strong className="mr-1">₹</strong>
-              <strong>{maxPrice}</strong>
+              <strong>{product.maxPrice}</strong>
             </p>
-            <p className="ml-2 mt-2">
-              {product && product.discountPercentage} %
-            </p>
+            <p className="ml-2 mt-2">{discount} %</p>
           </div>
 
           <div className="flex mt-2">
-            {Array(rating > 1 ? Math.ceil(rating) : 1)
+            {Array(product.rating > 1 ? Math.ceil(rating) : 1)
               .fill(rating)
               .map((_, i) => (
                 <p key={i}>🌟</p>
@@ -74,7 +103,13 @@ const RightSection = ({ product }: Props) => {
 
           <div className="text-slate-600 font-primary">
             <ul>
-              <li>{product && product.description} Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel natus exercitationem quasi illo, odit eligendi itaque corrupti neque nesciunt. Laboriosam ipsam cupiditate nihil necessitatibus distinctio nam error voluptatibus quas quibusdam.</li>
+              <li>
+                {product && product.description} Lorem ipsum dolor sit amet,
+                consectetur adipisicing elit. Vel natus exercitationem quasi
+                illo, odit eligendi itaque corrupti neque nesciunt. Laboriosam
+                ipsam cupiditate nihil necessitatibus distinctio nam error
+                voluptatibus quas quibusdam.
+              </li>
               <li>{product && product.description}</li>
               <li>{product && product.description}</li>
               <li> {product && product.description}</li>
@@ -108,17 +143,14 @@ const RightSection = ({ product }: Props) => {
                 <b>-</b>
               </button>
             </div>
-            <Link href={"/detailCart"} className="w-full">
-              {/* <button
-                className="bg-primary text-neutral mb-8 w-full my-8 py-2 px-20 lg:px-40 md:py-4 mr-4 rounded hover:bg-primaryFocus"
-                type="button"
-              >
-                Add To Cart
-              </button> */}
-              <UIButton title="Add to Cart" css="w-full flex justify-center"/>
-            </Link>
-          </div>
 
+              <UIButton
+                title="Add to Cart"
+                css="w-full flex justify-center"
+                onClick={() => handleAddtoCart()}
+              />
+
+          </div>
         </div>
       </div>
     </>

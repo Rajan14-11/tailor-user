@@ -3,20 +3,14 @@ import React, { useState } from "react";
 import { UIButton } from "../Common/Buttons/UIButton";
 import HomeSlider from "../HomePage/Slider";
 
-export const Description = () => {
+export const Description = ({product}:any) => {
   return (
     <div className="mt-4 mb-2">
       <div className="bg-slate-300 p-4 rounded">
         <div className="">
           <h3 className="text-2xl mb-2 font-secondary">Product Information</h3>
           <p className="py-2 text-xl font-primary" >
-            Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec
-            odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis.
-            Suspendisse urna viverra non, semper suscipit, posuere a, pede.
-            Donec nec justo eget felis facilisis fermentum. Aliquam porttitor
-            mauris sit amet orci. Aenean dignissim pellentesque felis. Phasellus
-            ultrices nulla quis nibh. Quisque a lectus. Donec consectetuer
-            ligula vulputate sem tristique cursus.
+            {product?.description}
           </p>
           <ul className="mb-2 text-slate-600 font-primary">
             <li>
@@ -28,13 +22,7 @@ export const Description = () => {
             </li>
           </ul>
           <p className="text-xl font-primary">
-            Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec
-            odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis.
-            Suspendisse urna viverra non, semper suscipit, posuere a, pede.
-            Donec nec justo eget felis facilisis fermentum. Aliquam porttitor
-            mauris sit amet orci. Aenean dignissim pellentesque felis. Phasellus
-            ultrices nulla quis nibh. Quisque a lectus. Donec consectetuer
-            ligula vulputate sem tristique cursus.
+            {product?.description}
           </p>
         </div>
       </div>
@@ -113,211 +101,56 @@ export const AdditionalInfo = () => {
   );
 };
 
-export const Reviews = () => {
-  const [writeReview, setWriteReview] = useState(false);
+export const Reviews = ({ratings}) => {
+
   return (
     <div className="mb-2 mt-4" id="reviews">
       <div className="gap-4">
+        {
+          ratings.length==0? <h1 className="text-center w-full my-12 font-secondary text-2xl">No reviews available.</h1>:
         <div className=" mb-4 p-4">
-          <h3 className="text-2xl mb-8 font-secondary">Reviews (2)</h3>
-          <div className="pb-6 mb-8 border-b">
-            <div className="bg-neutral p-4 rounded bg-white">
-              <div className="col-auto">
-                <h5 className="font-secondary">
-                  <a href="/react/molla/demo-13/product/default/bose-soundsport-wireless-headphones-blue/#">
-                    Samanta J.
-                  </a>
-                </h5>
-                <div className="ratings-container">
-                  <div className="inline-block text-xl ">
-                    <div
-                      className="inline-block text-xl"
-                      style={{ width: "60%" }}
-                    ></div>
-                    <span className="absolute left-1/2 top-auto bottom-[150%] text-xl bg-primary text-neutral p-3 overflow-visible -translate-x-1/2 visibility-hidden opacity-0 after:absolute after:left-inherit after:top-[96%] after:ml-[-6px] after:border after:border-t-soil ">
-                      3.00
-                    </span>
+          <h3 className="text-2xl mb-8 font-secondary">
+            Reviews ({ratings?.length})
+          </h3>
+          {ratings &&
+            ratings.map((rating, index) => (
+              <div className="pb-6 mb-8 border-b">
+                <div className="bg-neutral p-4 rounded bg-white">
+                  <div className="col-auto">
+                    <h5 className="font-secondary">
+                      <a href="/react/molla/demo-13/product/default/bose-soundsport-wireless-headphones-blue/#">
+                        {rating.userId.firstName} {rating.userId.lastName}
+                      </a>
+                    </h5>
+                    <div className="ratings-container">
+                      <div className="inline-block text-xl flex">
+
+
+                        {Array(rating.rating > 1 ? Math.ceil(rating.rating) : 1)
+                          .fill(rating.rating)
+                          .map((_, i) => (
+                            <p key={i}>🌟</p>
+                          ))}
+                      </div>
+                    </div>
+                    <span className="review-date mb-1">6 days ago</span>
+                  </div>
+                  <div className="col">
+                    <div className="mb-3">
+                      <p className="font-primary ">{rating.comment}</p>
+                    </div>
                   </div>
                 </div>
-                <span className="review-date mb-1">6 days ago</span>
               </div>
-              <div className="col">
-                <h5>Good, perfect size</h5>
-                <div className="mb-3">
-                  <p className="font-primary ">
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                    Ducimus cum dolores assumenda asperiores facilis porro
-                    reprehenderit animi culpa atque blanditiis commodi
-                    perspiciatis doloremque, possimus, explicabo, autem fugit
-                    beatae quae voluptas!
-                  </p>
-                </div>
-                <div className="text-base">
-                  <a
-                    className="text-slate-600"
-                    href="/react/molla/demo-13/product/default/bose-soundsport-wireless-headphones-blue/#"
-                  >
-                    <i className="icon-thumbs-up"></i>Helpful (2)
-                  </a>
-                  <a
-                    className="ml-6"
-                    href="/react/molla/demo-13/product/default/bose-soundsport-wireless-headphones-blue/#"
-                  >
-                    <i className="icon-thumbs-down"></i>Unhelpful (0)
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="bg-neutral p-4 rounded bg-white">
-            <div className="row no-gutters">
-              <div className="col-auto">
-                <h5 className="font-secondary">
-                  <a href="/react/molla/demo-13/product/default/bose-soundsport-wireless-headphones-blue/#">
-                    John Doe
-                  </a>
-                </h5>
-                <div className="ratings-container">
-                  <div className="inline-block text-xl">
-                    <div
-                      className="inline-block text-xl"
-                      style={{ width: "60%" }}
-                    ></div>
-                    <span className="tooltip-text">3.00</span>
-                  </div>
-                </div>
-                <span className="review-date mb-1">5 days ago</span>
-              </div>
-              <div className="col">
-                <h5>Very good</h5>
-                <div className="mb-6">
-                  <p className="font-primary">
-                    Sed, molestias, tempore? Ex dolor esse iure hic veniam
-                    laborum blanditiis laudantium iste amet. Cum non voluptate
-                    eos enim, ab cumque nam, modi, quas iure illum repellendus,
-                    blanditiis perspiciatis beatae!
-                  </p>
-                </div>
-                <div className="text-base">
-                  <a
-                    className="text-slate-600"
-                    href="/react/molla/demo-13/product/default/bose-soundsport-wireless-headphones-blue/#"
-                  >
-                    <i className="icon-thumbs-up"></i>Helpful (0)
-                  </a>
-                  <a
-                    className="ml-6"
-                    href="/react/molla/demo-13/product/default/bose-soundsport-wireless-headphones-blue/#"
-                  >
-                    <i className="icon-thumbs-down"></i>Unhelpful (0)
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
+            ))}
         </div>
-
-        <div className="ml-4">
-
-          <UIButton title="Add a Review"
-              onClick={() => setWriteReview(true)}
-          />
-        </div>
-
-        {writeReview && (
-          <div className="py-8 px-4 bg-neutral my-4 rounded">
-            <div className="title-wrapper text-left">
-              <h3 className="font-semibold font-secondary text-2xl mb-4 title-simple text-left text-normal">
-                Add a Review
-              </h3>
-              <p style={{ fontSize: 18 }} className="font-primary">
-                Your email address will not be published. Required fields are
-                marked *
-              </p>
-            </div>
-            <div className="flex items-center flex-wrap mb-8 font-primary">
-              <label htmlFor="rating" className="text-black mr-4">
-                Your rating *{" "}
-              </label>
-              <span className="flex relative text-xl mx-4 selected">
-                <a className="text-slate-600 w-[16px] z-10">1</a>
-                <a className="text-slate-600 w-[16px]">2</a>
-                <a className="text-slate-600 w-[16px]">3</a>
-                <a className="text-slate-600 w-[16px]">4</a>
-                <a className="text-slate-600 w-[16px]">5</a>
-              </span>
-              <select
-                name="rating"
-                id="rating"
-                // style={{ display: "none" }}
-              >
-                <option value="">Rate…</option>
-                <option value="5">Perfect</option>
-                <option value="4">Good</option>
-                <option value="3">Average</option>
-                <option value="2">Not that bad</option>
-                <option value="1">Very poor</option>
-              </select>
-            </div>
-            <form action="#" className="w-3/4 font-secondary">
-              <textarea
-                id="reply-message"
-                className="w-full h-20 mb-2 p-4"
-                placeholder="Comment *"
-                required
-              ></textarea>
-              <div className="row">
-                <div className="col-md-6">
-                  <input
-                    type="text"
-                    className="w-full p-4 mb-4 "
-                    id="reply-name"
-                    name="reply-name"
-                    placeholder="Name *"
-                    required
-                  />
-                </div>
-                <div className="col-md-6">
-                  <input
-                    type="email"
-                    className="w-full p-4 mb-4"
-                    id="reply-email"
-                    name="reply-email"
-                    placeholder="Email *"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="flex items-center mb-2">
-                <input
-                  type="checkbox"
-                  className="custom-checkbox"
-                  id="signin-remember"
-                  name="signin-remember"
-                />
-                <label
-                  className="text-slate-700 ml-2"
-                  htmlFor="signin-remember"
-                >
-                  Save my name, email, and website in this browser for the next
-                  time I comment.
-                </label>
-              </div>
-              <button
-                type="submit"
-                className="px-4 py-2 my-2 bg-primary text-neutral text-xl rounded"
-              >
-                Submit
-              </button>
-            </form>
-          </div>
-        )}
+        }
       </div>
     </div>
   );
 };
 
-const BottomPart = () => {
+const BottomPart = ({ product }: any) => {
   const [showDescription, setShowDescription] = useState(true);
   const [ShowAdditionalInfo, setShowAdditionalInfo] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
@@ -366,14 +199,14 @@ const BottomPart = () => {
           </ul>
         </div>
       </div>
-      {showDescription && <Description />}
+      {showDescription && <Description product={product} />}
       {ShowAdditionalInfo && <AdditionalInfo />}
-      {showReviews && <Reviews />}
+      {showReviews && <Reviews ratings={product?.ratings} />}
       <div className="w-full flex flex-col items-center ">
-        <HomeSlider/>
+        <HomeSlider />
         <Link href={"/tailordetails"}>
-        {/* <button className="w-48 bg-primary p-4 rounded text-neutral text-xl">Explore More</button> */}
-        <UIButton title="Explore More"/>
+          {/* <button className="w-48 bg-primary p-4 rounded text-neutral text-xl">Explore More</button> */}
+          <UIButton title="Explore More" />
         </Link>
       </div>
     </div>

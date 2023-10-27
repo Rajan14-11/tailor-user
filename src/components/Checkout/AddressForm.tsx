@@ -1,79 +1,74 @@
+import { useCreateUserAddressesMutation } from "@/Redux/api";
+import { useAppSelector } from "@/Redux/hooks";
 import { Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { UIButton } from "../Common/Buttons/UIButton";
 import TextInput from "../Common/Inputs/TextInput";
 import { Address } from "./CheckoutMain";
 
-interface AddressFormProps{
-  initialData?:Address|any,
-  onSubmitForm:Function|any,
-  withoutLayout?:boolean
+interface AddressFormProps {
+  initialData?: Address | any;
+  onSubmitForm: Function | any;
+  withoutLayout?: boolean;
 }
 
 const AddressForm = (props: AddressFormProps) => {
-  console.log(props)
+  console.log(props);
   const { initialData } = props;
-  const [name, setName] = useState(initialData ? initialData.name : "");
-  const [mobileNumber, setMobileNumber] = useState(
-    initialData ? initialData.mobileNumber : ""
-  );
-  const [pinCode, setPinCode] = useState(
-    initialData ? initialData.pinCode : ""
-  );
-  const [locality, setLocality] = useState(
-    initialData ? initialData.locality : ""
-  );
-  const [address, setAddress] = useState(
-    initialData ? initialData.address : ""
-  );
-  const [cityDistrictTown, setCityDistrictTown] = useState(
-    initialData ? initialData.cityDistrictTown : ""
-  );
-  const [state, setState] = useState(initialData ? initialData.state : "");
-  const [landmark, setLandmark] = useState(
-    initialData ? initialData.landmark : ""
-  );
-  const [alternatePhone, setAlternatePhone] = useState(
-    initialData ? initialData.alternatePhone : ""
-  );
-  const [addressType, setAddressType] = useState(
-    initialData ? initialData.addressType : ""
-  );
+  const user = useAppSelector((state) => state.user);
   const [id, setId] = useState(initialData ? initialData._id : "");
   const [submitFlag, setSubmitFlag] = useState(false);
 
-  const inputContainer = {
-    width: "100%",
-    marginRight: 10,
+  const [createAddress, { data: newadd, error: newadderror }] =
+    useCreateUserAddressesMutation();
+
+  const [_address,set_Address] = useState({})
+  const onAddressSubmit = (values: any) => {
+    const payload = {
+      useraddress: {
+        name: values.name,
+        mobileNumber: values.mobileNumber,
+        pinCode: values.pinCode,
+        locality: values.locality,
+        completeaddress: values.address,
+        cityDistrictTown: values.cityDistrictTown,
+        state: values.state,
+        landmark: values.landmark,
+        alternatePhone: values.alternatePhone,
+        addressType: values.addressType,
+      },
+    };
+    console.log(payload);
+    if (id) {
+      payload.useraddress._id = id;
+    }
+    setSubmitFlag(true);
+    createAddress({ payload });
+
+    if (id) {
+      set_Address(payload.useraddress)
+    }
   };
 
-  // const onAddressSubmit = (e: any) => {
-  //    const payload = {
-  //      address: {
-  //        name,
-  //        mobileNumber,
-  //        pinCode,
-  //        locality,
-  //        address,
-  //        cityDistrictTown,
-  //        state,
-  //        landmark,
-  //        alternatePhone,
-  //        addressType,
-  //       _id:id
-  //      },
-  //    };
-  //    // console.log(payload);
-  //    if (id) {
-  //      payload.address._id = id;
-  //    }
-  //   setSubmitFlag(true);
-  //   alert("Form Submitted")
-  // };
+  // console.log(newadd?.address)
 
+  useEffect(() => {
+    if (submitFlag)
+      if (typeof newadd !== undefined) {
+        if (!id) {
+          set_Address(newadd?.address?.address.slice(
+            newadd?.address?.address.length - 1
+          )[0])
+        }
+        props.onSubmitForm(_address);
+      }
+      // console.log(_address)
+    }, [typeof newadd]);
+
+    console.log(_address)
   // useEffect(() => {
   //   // console.log("addressCount", user.address);
-  //   if (submitFlag) {
+  //   if (submitFonlag) {
   //     // console.log("where are we", user);
   //     let _address = {};
   //     if (id) {
@@ -104,19 +99,18 @@ const AddressForm = (props: AddressFormProps) => {
       <>
         <Formik
           initialValues={{
-            name,
-            mobileNumber,
-            pinCode,
-            locality,
-            address,
-            cityDistrictTown,
-            state,
-            landmark,
-            alternatePhone,
-            addressType: "home",
+            name: initialData?.name || "",
+            mobileNumber: initialData?.mobileNumber || "",
+            pinCode: initialData?.pinCode || "",
+            locality: initialData?.locality || "",
+            address: initialData?.address || "",
+            cityDistrictTown: initialData?.cityDistrictTown || "",
+            state: initialData?.state || "",
+            landmark: initialData?.landmark || "",
+            alternatePhone: initialData?.alternatePhone || "",
+            addressType: initialData?.addressType || "home",
           }}
-          onSubmit={props.onSubmitForm}
-          className="w-full"
+          onSubmit={(values) => onAddressSubmit(values)}
         >
           <Form className="w-full sm:w-3/4 m-auto">
             <div className="flex flex-col sm:flex-row justify-between">
@@ -231,14 +225,15 @@ const AddressForm = (props: AddressFormProps) => {
     <div className="bg-white shadow-xl mb-8">
       <div className={`w-full px-4 sm:px-8 py-4`}>
         <div>
-          <span className="inline-block text-center bg-neutral text-primary rounded p-4 cursor-pointer">+</span>
-          <span className="inline-block font-semibold ml-6 cursor-pointer">{"ADD NEW ADDRESS"}</span>
+          <span className="inline-block text-center bg-neutral text-primary rounded p-4 cursor-pointer">
+            +
+          </span>
+          <span className="inline-block font-semibold ml-6 cursor-pointer">
+            {"ADD NEW ADDRESS"}
+          </span>
         </div>
       </div>
-      <div className="px-2 sm:px-20 pb-8"
-      >
-        {renderAddressForm()}
-      </div>
+      <div className="px-2 sm:px-20 pb-8">{renderAddressForm()}</div>
     </div>
   );
 };

@@ -14,28 +14,30 @@ import {BsFillBookmarkHeartFill} from "react-icons/bs"
 import Dropdown from "../Common/UI/Dropdown";
 import SelectLocation from "./SelectLocation";
 import SideCart from "./SideCart";
-import { isUserAuthenticated, logout } from "@/Redux/userSlice";
+import { loginSlice, logout } from "@/Redux/userSlice";
 import Cookies from "js-cookie";
 
-import { useAppDispatch } from "@/Redux/hooks";
-import Router from "next/router";
+import { useAppDispatch, useAppSelector } from "@/Redux/hooks";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { emptyCart } from "@/Redux/cartSlice";
 
 interface Props {
   show: boolean;
   setShow: Function;
 }
 
-
-
 const RenderLoggedInMenu = ({ show, setShow }: Props) => {
+  const router = useRouter();
   const dispatch = useAppDispatch();
 
   function handleLogout() {
     Cookies.remove("token");
-    Router.push("/");
+    router.push("/");
     dispatch(logout());
-    Cookies.set("isUserAuthenticated", false);
-    Cookies.set('user','')
+    Cookies.set("isUserAuthenticated", "false");
+    Cookies.set("user", "");
+    // dispatch(emptyCart(''))
   }
   return (
     <Dropdown
@@ -57,7 +59,7 @@ const RenderLoggedInMenu = ({ show, setShow }: Props) => {
           label: "Logout",
           href: "",
           icon: <RiLogoutBoxFill />,
-          onClick :  handleLogout,
+          onClick: handleLogout,
         },
       ]}
     />
@@ -70,22 +72,40 @@ const RenderNonLoggedInMenu = ({ show, setShow }: Props) => {
       show={show}
       setShow={setShow}
       menus={[
-        { label: "SignIn", href: "", icon: null },
-        { label: "SignUp", href: "", icon: null },
-        { label: "Need Help", href: "", icon: null },
+        { label: "SignIn", href: "/login", icon: null },
+        { label: "SignUp", href: "/signup", icon: null },
+        { label: "Need Help", href: "/", icon: null },
       ]}
     />
   );
 };
 
 function Topbar() {
+  const dispatch = useAppDispatch();
+  const token = Cookies.get("token");
+  useEffect(() => {
+    if (Cookies.get("isUserAuthenticated") == "true") {
+      console.log("indide ");
+      dispatch(loginSlice({ token }));
+    }
+  }, []);
+  let location;
+  if (typeof window !== "undefined") {
+    if (window.localStorage.getItem("address"))
+      location = JSON.parse(window.localStorage.getItem("address"));
+  }
+  const user = useAppSelector((state) => state.user.isAuthenticated);
 
-
-  const user = Cookies.get("isUserAuthenticated");
   // console.log(user);
   const [show, setShow] = useState(false);
-  const { openCart, setOpenCart, selectLocation, setSelectLocation } =
-    useStateContext();
+  const {
+    openCart,
+    setOpenCart,
+    selectLocation,
+    setSelectLocation,
+    search,
+    setSearch,
+  } = useStateContext();
   // console.log(openCart);
   return (
     <div className="flex justify-evenly items-center w-full h-16 px-4 bg-neutral sticky top-0 z-[100] font-secondary">
@@ -101,8 +121,11 @@ function Topbar() {
           <span className="text-secondary mr-4 border-b border-secondary hover:text-primary font-semibold ">
             Other
           </span>
-          <p className="text-slate-500 text-ellipsis whitespace-nowrap overflow-hidden w-full hover:text-slate-400 w-3/4 flex-start flex">
-            Entered Location
+          <p
+            className="text-slate-500 text-ellipsis whitespace-nowrap overflow-hidden w-full hover:text-slate-400 w-3/4 flex-start flex"
+            suppressHydrationWarning
+          >
+            {location?.formatted_address}
           </p>
         </button>
       </div>
@@ -113,6 +136,8 @@ function Topbar() {
           type={"search"}
           placeholder="search"
           className="w-5/6 p-2 hidden sm:block font-neutral"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
         />
       </div>
       <div
@@ -129,13 +154,12 @@ function Topbar() {
             className="sm:block hidden hover:text-primary"
             onMouseEnter={() => setShow(true)}
           >
-            {Cookies.get('user')}
+            {Cookies.get("user") !== undefined &&
+              JSON.parse(Cookies.get("user")).fullName}
           </button>
         ) : (
           // <Link href={"/login"}>
-          <button className="sm:block hidden hover:text-primary">
-            Sign In
-          </button>
+          <button className="sm:block hidden hover:text-primary"></button>
           // </Link>
         )}
         {user ? (
@@ -146,16 +170,17 @@ function Topbar() {
       </div>
 
       {user ? (
-        <div
+        <Link
+          href={"/detailCart"}
           className="flex items-center cursor-pointer hover:text-secondary "
-          onClick={() => setOpenCart(true)}
+          // onClick={() => setOpenCart(true)}
         >
           <AiOutlineShoppingCart className="mr-2 text-xl relative cursor-pointer" />
-          <div className="cursor-pointer absolute top-[9.3%] bg-primary rounded-full p-1 h-[20px] w-[20px] text-center flex items-start hover:text-neutral">
-            <p className="absolute top-[-3%] left-[30%]">0</p>
-          </div>
+          {/* <div className="cursor-pointer absolute top-[9.3%] bg-primary rounded-full p-1 h-[20px] w-[20px] text-center flex items-start hover:text-neutral"> */}
+          {/* <p className="absolute top-[-3%] left-[30%]">0</p> */}
+          {/* </div> */}
           <p className="hidden sm:block">Cart</p>
-        </div>
+        </Link>
       ) : (
         ""
       )}

@@ -1,9 +1,17 @@
 "use-client";
 import Images from "@/assets/Images";
 import { actionTypes, useCartStateContext } from "@/Context/CartContext";
+import {
+  useAddToCartMutation,
+  useAddToWishlistMutation,
+  useGetCartMutation,
+  useRemoveItemMutation,
+} from "@/Redux/api";
+import { addTocart, getCartItems } from "@/Redux/cartSlice";
+import { useAppDispatch, useAppSelector } from "@/Redux/hooks";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   AiOutlineHeart,
   AiOutlineMinusCircle,
@@ -70,9 +78,30 @@ const allproducts = {
 interface Props {
   checkoutStep?: boolean;
   orderDetails?: boolean;
+  cartItems?: any;
 }
 
 export const OrderSummary = (props: Props) => {
+
+ let totalAmount,totalQty;
+ if (props.cartItems !== undefined) {
+   totalAmount = Object.keys(props.cartItems && props.cartItems).reduce(
+     (totalPrice, key) => {
+       const { price, qty }:any = props.cartItems[key];
+       return totalPrice + price * qty;
+     },
+     0
+   );
+   totalQty = Object.keys(props.cartItems && props.cartItems).reduce(
+     (totalqty, key) => {
+       const { price, qty }: any = props.cartItems[key];
+       return totalqty + qty;
+     },
+     0
+   );
+ }
+ console.log(totalAmount,totalQty)
+ let shippingCharges =50
   return (
     <div
       className={`h-fit ${
@@ -95,7 +124,7 @@ export const OrderSummary = (props: Props) => {
             Order Summary
             <span>
               <span className="font-semibold text-black mr-1">₹</span>
-              {allproducts.total}
+              {totalAmount && totalAmount + shippingCharges}
             </span>
           </li>
 
@@ -109,7 +138,7 @@ export const OrderSummary = (props: Props) => {
                 Total
                 <span className="">
                   <span className="font-semibold text-black mr-1">₹</span>
-                  {allproducts.discountedTotal}
+                  {totalAmount && totalAmount}
                 </span>
               </li>
             </div>
@@ -119,10 +148,10 @@ export const OrderSummary = (props: Props) => {
                   props.orderDetails ? "pb-0" : "pb-6"
                 }`}
               >
-                Discount
+                Total Qty
                 <span>
-                  <span className="font-semibold text-black mr-1">₹</span>
-                  {allproducts.total - allproducts.discountedTotal}
+                  {totalQty}
+                  <span className="font-semibold text-black ml-1"> items</span>
                 </span>
               </li>
             </div>
@@ -135,7 +164,7 @@ export const OrderSummary = (props: Props) => {
                 Shipping
                 <span>
                   <span className="font-semibold text-black mr-1">₹</span>
-                  50
+                  {shippingCharges}
                 </span>
               </li>
             </div>
@@ -149,7 +178,7 @@ export const OrderSummary = (props: Props) => {
             Total Order
             <span>
               <span className="font-semibold text-black mr-1">₹</span>
-              {allproducts.discountedTotal + 50}
+              {totalAmount && totalAmount + shippingCharges}
             </span>
           </li>
         </ul>
@@ -158,24 +187,26 @@ export const OrderSummary = (props: Props) => {
   );
 };
 // const { dispatch, state } = useCartStateContext();
-const DetailCart = () => {
-  let quantity = 0;
-  const { dispatch, state } = useCartStateContext();
+const DetailCart = ({
+  cartItem,
+  loading,
+  removeItem,
+  onQuantityIncrement,
+  onQuantityDecrement,
+}: any) => {
+
+  const [cartItems, setCartItems] = useState<any>({});
+
   useEffect(() => {
-    // dispatch({ type: actionTypes.GET_CART_REQ });
-    // dispatch({ type: actionTypes.GET_CART_SUCCESS });
-  });
-  const removeItem = (id: number) => {
-    // dispatch({ type: actionTypes.REMOVE_ITEM, payload: id });
-  };
+    if (cartItem !== undefined) setCartItems(cartItem);
+  }, [cartItem]);
 
-  const increaseProductCount = (id: number) => {
-    // dispatch({ type: actionTypes.INCREASE_COUNT, payload: id });
-  };
+  const [addToWishlist,{data,error,isSuccess}] =useAddToWishlistMutation()
+  const handleWishlist =(id:number)=>{
+     addToWishlist({prodId:id})
+  }
 
-  const decreaseProductCount = (id: number) => {
-    // dispatch({ type: actionTypes.DECREASE_COUNT, payload: id });
-  };
+
   return (
     <div className="bg-neutral h-fit">
       {/* <CheckoutSteps activeStep={0} /> */}
@@ -188,121 +219,182 @@ const DetailCart = () => {
           </h1>
         </div>
         <div className="w-full m-auto flex flex-col md:flex-row justify-between ">
-          <div className="flex flex-col md:flex-row w-full justify-between">
-            <div className="w-full bg-white shadow-xl py-4 md:w-2/3 mb-4 rounded">
-              <div className="">
-                <table className="w-full py-4">
-                  <thead className="w-full text-xl p-4">
-                    <tr className="border-b border-b-black p-4 font-secondary">
-                      <th
-                        style={{ width: "35%", textAlign: "center" }}
-                        scope="col"
-                      >
-                        Product
-                      </th>
-                      <th
-                        style={{ width: "15%", textAlign: "center" }}
-                        scope="col"
-                      >
-                        Price
-                      </th>
-                      <th
-                        style={{ width: "35%", textAlign: "center" }}
-                        scope="col"
-                      >
-                        Quantity
-                      </th>
-                      <th
-                        style={{ width: "15%", textAlign: "center" }}
-                        scope="col"
-                      >
-                        Total
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {allproducts.products &&
-                      allproducts.products.map((product) => {
-                        return (
-                          <tr
-                            key={product.id}
-                            className="border relative font-secondary"
-                          >
-                            <td style={{ width: "35%" }}>
-                              <div className="w-full py-8 px-4">
-                                <div
-                                  className="flex flex-col md:flex-row justify-center items-center"
-                                  style={{ position: "relative" }}
-                                >
-                                  <Link href={`/productdetail/${product.id}`}>
-                                    <Image
-                                      src={Images.service1}
-                                      alt=""
-                                      className="w-full mr-2 h-28 border border-primary shadow-xl mb-2 rounded "
-                                    />
-                                  </Link>
-                                  <div className="w-full text-center">
-                                    <p className="">{product.title}</p>
-                                  </div>
-                                </div>
-                              </div>
-                            </td>
-                            <td style={{ width: "15%", textAlign: "center" }}>
-                              <h6>
-                                <span className="font-semibold text-black mr-1">
-                                  ₹
-                                </span>
-                                {product.price}
-                              </h6>
-                            </td>
-                            <td style={{ width: "35%" }}>
-                              <div className="flex justify-center items-center">
-                                <AiOutlineMinusCircle className="cursor-pointer hover:text-primary text-xl" />
-                                <p className="mx-4 text-xl py-4 px-2 ">
-                                  {product.quantity}
-                                </p>
-                                <AiOutlinePlusCircle
-                                  className="cursor-pointer hover:text-primary text-xl"
-                                  onClick={() =>
-                                    increaseProductCount(product.id)
-                                  }
-                                />
-                              </div>
-                            </td>
-                            <td style={{ width: "20%", textAlign: "center" }}>
-                              <h6>
-                                <span className="font-semibold text-black mr-1">
-                                  ₹
-                                </span>
-                                {product.price * product.quantity}
-                              </h6>
-                              <ImBin
-                                className="cursor-pointer text-neutralFocus hover:text-primary absolute right-[5px] bottom-[10px] text-xl ml-4"
-                                onClick={() => removeItem(product.id)}
-                              />
-                              <AiOutlineHeart
-                                className="cursor-pointer text-secondary hover:text-primary absolute right-[5px] top-[10px] text-xl ml-4"
-                                // onClick={() => removeItem(product.id)}
-                              />
-                            </td>
+          {loading ? (
+            <h1>Loading...</h1>
+          ) : (
+            <div className="flex flex-col md:flex-row w-full justify-between">
+              {Object.keys(cartItems).length == 0 ? (
+                <h1 className="text-2xl text-center my-12 font-secondary w-full">No products to show Kindly add One.</h1>
+              ) : (
+                <>
+                  <div className="w-full bg-white shadow-xl py-4 md:w-2/3 mb-4 rounded">
+                    <div className="">
+                      <table className="w-full py-4">
+                        <thead className="w-full text-xl p-4">
+                          <tr className="border-b border-b-black p-4 font-secondary">
+                            <th
+                              style={{ width: "35%", textAlign: "center" }}
+                              scope="col"
+                            >
+                              Product
+                            </th>
+                            <th
+                              style={{ width: "15%", textAlign: "center" }}
+                              scope="col"
+                            >
+                              Price
+                            </th>
+                            <th
+                              style={{ width: "35%", textAlign: "center" }}
+                              scope="col"
+                            >
+                              Quantity
+                            </th>
+                            <th
+                              style={{ width: "15%", textAlign: "center" }}
+                              scope="col"
+                            >
+                              Total
+                            </th>
                           </tr>
-                        );
-                      })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+                        </thead>
+                        <tbody>
+                          {cartItems !== undefined &&
+                            Object.keys(cartItems && cartItems).map((key) => {
+                              return (
+                                <tr
+                                  key={cartItems[key]._id}
+                                  className="border relative font-secondary"
+                                >
+                                  <td style={{ width: "35%" }}>
+                                    <div className="w-full py-8 px-4">
+                                      <div
+                                        className="flex flex-col md:flex-row justify-center items-center"
+                                        style={{ position: "relative" }}
+                                      >
+                                        <Link
+                                          href={`/productPage?productId=${cartItems[key]._id}`}
+                                        >
+                                          <Image
+                                            src={
+                                              cartItems[key].img
+                                                ? cartItems[key].img
+                                                : cartItems[key]
+                                                    ?.productPictures[0].img
+                                            }
+                                            alt=""
+                                            width={500}
+                                            height={500}
+                                            className="w-full mr-2 h-28 border border-primary shadow-xl mb-2 rounded "
+                                          />
+                                        </Link>
+                                        <div className="w-full text-center">
+                                          <p className="">
+                                            {cartItems[key].name}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td
+                                    style={{
+                                      width: "15%",
+                                      textAlign: "center",
+                                    }}
+                                  >
+                                    <h6>
+                                      <span className="font-semibold text-black mr-1">
+                                        ₹
+                                      </span>
+                                      {cartItems[key].price}
+                                    </h6>
+                                  </td>
+                                  <td style={{ width: "35%" }}>
+                                    <div className="flex justify-center items-center">
+                                      <AiOutlineMinusCircle
+                                        onClick={
+                                          cartItems[key].qty > 1
+                                            ? () =>
+                                                onQuantityDecrement(
+                                                  cartItems[key]._id
+                                                )
+                                            : () =>
+                                                removeItem(cartItems[key]._id)
+                                        }
+                                        className="cursor-pointer hover:text-primary text-xl"
+                                      />
+                                      <p className="mx-4 text-xl py-4 px-2 ">
+                                        {cartItems[key].qty}
+                                      </p>
+                                      <AiOutlinePlusCircle
+                                        className="cursor-pointer hover:text-primary text-xl"
+                                        onClick={() =>
+                                          onQuantityIncrement(
+                                            cartItems[key]._id
+                                          )
+                                        }
+                                      />
+                                    </div>
+                                  </td>
+                                  <td
+                                    style={{
+                                      width: "20%",
+                                      textAlign: "center",
+                                    }}
+                                  >
+                                    <h6>
+                                      <span className="font-semibold text-black mr-1">
+                                        ₹
+                                      </span>
+                                      {cartItems[key].price *
+                                        cartItems[key].qty}
+                                    </h6>
+                                    <ImBin
+                                      className="cursor-pointer text-neutralFocus hover:text-primary absolute right-[5px] bottom-[10px] text-xl ml-4"
+                                      onClick={() =>
+                                        removeItem(cartItems[key]._id)
+                                      }
+                                    />
+                                    {
+                                      isSuccess ?
+                                      <AiOutlineHeart
+                                        className="cursor-pointer text-secondary hover:text-primary absolute right-[5px] top-[10px] text-xl ml-4"
+                                        onClick={() =>
+                                          handleWishlist(cartItems[key]._id)
+                                        }
+                                      />:
+                                    <AiOutlineHeart
+                                      className="cursor-pointer text-secondary hover:text-primary absolute right-[5px] top-[10px] text-xl ml-4"
+                                      onClick={() =>
+                                        handleWishlist(cartItems[key]._id)
+                                      }
+                                    />
+                                    }
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
 
-            <OrderSummary />
-          </div>
+                  <OrderSummary cartItems={cartItems} />
+                </>
+              )}
+            </div>
+          )}
         </div>
         <div className="flex justfiy-center w-full">
+          {
+              Object.keys(cartItems).length == 0 ? "":
           <Link
-            href="/checkout"
+          href="/checkout"
             className="w-1/3 font-bold m-auto font-secondary my-4 text-center p-4 text-xl capitalize bg-primary rounded text-neutral hover:bg-primaryFocus"
           >
             Proceed to Checkout
           </Link>
+      }
         </div>
       </section>
     </div>

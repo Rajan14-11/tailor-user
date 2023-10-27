@@ -19,8 +19,9 @@ interface Product {
 interface Props {
     product:Product
 }
-const LeftSection = ({product}:Props) => {
-  const [image, setImage] = useState(product.images && product.thumbnail);
+const LeftSection = ({product}:any) => {
+  // console.log(product)
+  const [image, setImage] = useState(product?.productPictures[0].img);
 
   return (
     <>
@@ -35,36 +36,20 @@ const LeftSection = ({product}:Props) => {
           />
         </div>
         <div className="flex md:my-16 mt-12 w-[90%] flex-wrap md:flex-nowrap">
+          {
+            product?.productPictures.map((pic:any)=>(
           <div className="mr-8 mb-4 flex justify-center">
             <Image
               alt="small-image"
-              className="w-full h-full cursor-pointer transition-[0.5s]"
-              width={200}
-              height={100}
-              src={product.images && product.images[0]}
-              onClick={() => setImage(product.images && product.images[0])}
-            />
-          </div>
-          <div className="mr-8 mb-4 flex justify-center">
-            <Image
-              alt="small-image"
-              src={product.images && product.images[1]}
+              src={pic.img}
               width={200}
               height={100}
               className="w-full h-full cursor-pointer transition-[0.5s]"
-              onClick={() => setImage(product && product.images[1])}
+              onClick={() => setImage(pic.img)}
             />
           </div>
-          <div className="flex mb-4 justify-center">
-            <Image
-              alt="small-image"
-              src={product.images && product.images[2]}
-              width={200}
-              height={100}
-              className="w-full h-full cursor-pointer transition-[0.5s]"
-              onClick={() => setImage(product.images && product.images[2])}
-            />
-          </div>
+            ))
+          }
         </div>
       </div>
     </>

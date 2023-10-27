@@ -9,8 +9,20 @@ import About from "@/components/LandingPage/About";
 import Testimonials from "@/components/LandingPage/Testimonials";
 import Image from "next/image";
 import Images from "@/assets/Images";
+import { StandaloneSearchBox, useJsApiLoader } from "@react-google-maps/api";
+import { useRef } from "react";
 
 function LandingPage() {
+
+  // if(navigator.geolocation){
+  //   navigator.geolocation.getCurrentPosition(position=>{
+  //       let long = position.coords.longitude;
+  //       let lat = position.coords.latitude;
+  //       console.log(long,lat,position)
+  //   })
+// }
+
+// const autocomplete = new google.maps.places.Autocomplete(input, options);
   return (
     <>
       <div className="w-full h-screen ">
@@ -23,8 +35,8 @@ function LandingPage() {
             quality={100}
           />
           <div className="w-full h-full backdrop-brightness-50">
-            <Header />
-            <HeroPage />
+            <Header/>
+            <HeroPage/>
           </div>
         </div>
       </div>
